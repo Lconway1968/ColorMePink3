@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coloring Book Studio – Grok Powered</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            studio: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .logo-font { font-family: 'Fredoka', sans-serif; }
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    select, input, textarea {
+      background-color: #0f172a !important;
+      border-color: #334155 !important;
+    }
+    select:focus, input:focus, textarea:focus {
+      border-color: #0ea5e9 !important;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    }
+    .prompt-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    .tab-active {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl">🎨</div>
+        <div>
+          <h1 class="logo-font text-xl font-semibold tracking-tight">Coloring Book Studio</h1>
+          <p class="text-xs text-slate-400">Powered by Grok Imagine</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        <span class="hidden sm:inline">Christian • Kids • Kawaii ready</span>
+        <span class="px-2 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs">v1.2</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <button onclick="switchTab('page')" id="tab-page" class="tab-active px-5 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap">
+        📄 Coloring Page Generator
+      </button>
+      <button onclick="switchTab('cover')" id="tab-cover" class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800 hover:bg-slate-700 transition-all whitespace-nowrap">
+        📚 Cover Art Generator
+      </button>
+      <button onclick="switchTab('saved')" id="tab-saved" class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800 hover:bg-slate-700 transition-all whitespace-nowrap">
+        💾 Saved Styles & Agents
+      </button>
+    </div>
+
+    <!-- ==================== COLORING PAGE TAB ==================== -->
+    <div id="panel-page" class="grid lg:grid-cols-5 gap-6">
+      <!-- Form -->
+      <div class="lg:col-span-3 space-y-5">
+        <div class="glass rounded-2xl p-6 space-y-5">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">1</span>
+            Page Parameters
+          </h2>
+
+          <!-- Subject / Theme -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Subject / Theme</label>
+            <input type="text" id="subject" placeholder="e.g. cute lamb with a small cross, Noah's ark animals, praying bunny..."
+              class="w-full rounded-xl px-4 py-3 text-sm border focus:ring-0"
+              value="cute kawaii animals with gentle Christian symbols">
+            <p class="text-xs text-slate-500 mt-1">Be specific. Works with 1–4 subjects per page.</p>
+          </div>
+
+          <!-- Style Preset -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Coloring Book Style</label>
+            <select id="style" class="w-full rounded-xl px-4 py-3 text-sm">
+              <option value="kawaii">Kawaii (big eyes, super cute, simple shapes)</option>
+              <option value="bold-simple">Bold & Simple (preschool / thick lines)</option>
+              <option value="cartoon">Classic Cartoon (friendly & clean)</option>
+              <option value="mandala">Mandala / Intricate Patterns</option>
+              <option value="zentangle">Zentangle / Detailed Patterns</option>
+              <option value="realistic-outline">Realistic Outline (animal anatomy)</option>
+              <option value="whimsical">Whimsical / Storybook</option>
+              <option value="minimal">Minimalist / Clean Silhouette</option>
+            </select>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <!-- Age / Complexity -->
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Age Group / Complexity</label>
+              <select id="complexity" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="preschool">Preschool (3–5) – very simple, huge shapes</option>
+                <option value="kids" selected>Kids (6–10) – clear & friendly</option>
+                <option value="tweens">Tweens (11–14) – more detail</option>
+                <option value="adults">Adults – intricate & detailed</option>
+              </select>
+            </div>
+
+            <!-- Line Weight -->
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Line Weight</label>
+              <select id="lineWeight" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="thick">Thick (4–6 px) – best for young kids</option>
+                <option value="medium" selected>Medium (2–4 px) – most popular</option>
+                <option value="thin">Thin (1–2 px) – detailed / adult</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <!-- Faith Theme Toggle -->
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Christian / Faith Theme</label>
+              <select id="faith" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="yes" selected>Yes – include gentle Christian symbols</option>
+                <option value="subtle">Subtle (cross, dove, rainbow only)</option>
+                <option value="no">No – pure animals / nature</option>
+              </select>
+            </div>
+
+            <!-- Aspect Ratio -->
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Page Size / Ratio</label>
+              <select id="aspect" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="portrait" selected>Portrait (8.5×11 style)</option>
+                <option value="square">Square (8.5×8.5)</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- NEW: Subjects per page + Number of pages -->
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Subjects per Page</label>
+              <select id="subjectsPerPage" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="1" selected>1 subject (focused & simple)</option>
+                <option value="2">2 subjects (side-by-side or interacting)</option>
+                <option value="3">3 subjects (small group / scene)</option>
+                <option value="4">4 subjects (busy scene – best for older kids)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Number of Pages</label>
+              <input type="number" id="numPages" min="1" max="30" value="1"
+                class="w-full rounded-xl px-4 py-3 text-sm border"
+                placeholder="1–30">
+              <p class="text-xs text-slate-500 mt-1">Generates up to 30 unique prompts</p>
+            </div>
+          </div>
+
+          <!-- Extra Details -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Extra Details (optional)</label>
+            <textarea id="extra" rows="2" placeholder="e.g. sitting under a rainbow, holding a small heart, smiling, single subject centered..."
+              class="w-full rounded-xl px-4 py-3 text-sm border"></textarea>
+          </div>
+
+          <button onclick="buildPagePrompt()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 font-semibold text-white transition-all shadow-lg shadow-sky-500/20">
+            ✨ Generate Optimized Prompt(s)
+          </button>
+        </div>
+      </div>
+
+      <!-- Prompt Output -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="glass rounded-2xl p-5 sticky top-24">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-sm text-slate-300">Ready-to-Use Prompt(s)</h3>
+            <button onclick="copyPrompt('pagePrompt')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 transition">Copy All</button>
+          </div>
+          <textarea id="pagePrompt" rows="14" class="prompt-box w-full rounded-xl p-4 bg-slate-900 border border-slate-700 text-slate-200 resize-none" readonly
+            placeholder="Your optimized coloring page prompt(s) will appear here..."></textarea>
+          
+          <div class="mt-4 space-y-2 text-xs text-slate-400">
+            <p>💡 <strong>How to use:</strong></p>
+            <ol class="list-decimal list-inside space-y-1 ml-1">
+              <li>Copy the prompt(s) above</li>
+              <li>Paste into Grok (or xAI Imagine / any image model)</li>
+              <li>Ask for pure black line art on white</li>
+              <li>Download & print</li>
+            </ol>
+          </div>
+
+          <button onclick="saveStyle('page')" class="mt-4 w-full py-2.5 rounded-xl border border-slate-600 hover:border-sky-500 hover:bg-sky-500/10 text-sm transition">
+            💾 Save this Style as Agent
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== COVER ART TAB ==================== -->
+    <div id="panel-cover" class="hidden grid lg:grid-cols-5 gap-6">
+      <div class="lg:col-span-3 space-y-5">
+        <div class="glass rounded-2xl p-6 space-y-5">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">2</span>
+            Cover Art Parameters
+          </h2>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Book Title</label>
+            <input type="text" id="coverTitle" value="God's Cute Animals" 
+              class="w-full rounded-xl px-4 py-3 text-sm border">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Subtitle / Tagline (optional)</label>
+            <input type="text" id="coverSubtitle" value="A Kawaii Christian Coloring Book for Kids" 
+              class="w-full rounded-xl px-4 py-3 text-sm border">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Main Visual Theme</label>
+            <input type="text" id="coverTheme" value="adorable group of kawaii animals (lamb, doves, bunny, giraffe) under a soft rainbow with gentle crosses and hearts"
+              class="w-full rounded-xl px-4 py-3 text-sm border">
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Art Style</label>
+              <select id="coverStyle" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="kawaii-pastel" selected>Kawaii Pastel (soft & cute)</option>
+                <option value="bright-cartoon">Bright Cartoon</option>
+                <option value="watercolor">Soft Watercolor</option>
+                <option value="digital-illustration">Clean Digital Illustration</option>
+                <option value="storybook">Classic Storybook</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">Color Mood</label>
+              <select id="coverMood" class="w-full rounded-xl px-4 py-3 text-sm">
+                <option value="pastel" selected>Soft Pastels</option>
+                <option value="bright">Bright & Cheerful</option>
+                <option value="warm">Warm Golden</option>
+                <option value="cool">Cool & Calm</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">Extra Cover Instructions</label>
+            <textarea id="coverExtra" rows="2" placeholder="e.g. leave clean space at top for title, smiling animals looking at viewer, soft grass and sky..."
+              class="w-full rounded-xl px-4 py-3 text-sm border"></textarea>
+          </div>
+
+          <button onclick="buildCoverPrompt()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 font-semibold text-white transition-all shadow-lg shadow-purple-500/20">
+            ✨ Generate Cover Prompt
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <div class="glass rounded-2xl p-5 sticky top-24">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-sm text-slate-300">Cover Prompt</h3>
+            <button onclick="copyPrompt('coverPrompt')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 transition">Copy</button>
+          </div>
+          <textarea id="coverPrompt" rows="14" class="prompt-box w-full rounded-xl p-4 bg-slate-900 border border-slate-700 text-slate-200 resize-none" readonly
+            placeholder="Your optimized cover art prompt will appear here..."></textarea>
+          <button onclick="saveStyle('cover')" class="mt-4 w-full py-2.5 rounded-xl border border-slate-600 hover:border-purple-500 hover:bg-purple-500/10 text-sm transition">
+            💾 Save Cover Style
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SAVED TAB ==================== -->
+    <div id="panel-saved" class="hidden">
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg font-semibold">Saved Styles & Agents</h2>
+          <button onclick="clearSaved()" class="text-xs text-red-400 hover:text-red-300">Clear All</button>
+        </div>
+        <div id="savedList" class="space-y-3">
+          <p class="text-slate-500 text-sm">No saved styles yet. Generate a prompt and click “Save this Style as Agent”.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="max-w-7xl mx-auto px-4 py-8 text-center text-xs text-slate-600">
+    Coloring Book Studio • Optimized prompts for clean printable line art • Built for Grok Imagine
+  </footer>
+
+  <script>
+    // ========== TAB SWITCHING ==========
+    function switchTab(tab) {
+      ['page', 'cover', 'saved'].forEach(t => {
+        document.getElementById('panel-' + t).classList.add('hidden');
+        document.getElementById('tab-' + t).classList.remove('tab-active');
+        document.getElementById('tab-' + t).classList.add('bg-slate-800');
+      });
+      document.getElementById('panel-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('tab-active');
+      document.getElementById('tab-' + tab).classList.remove('bg-slate-800');
+      if (tab === 'saved') renderSaved();
+    }
+
+    // ========== STYLE MAPS ==========
+    const styleMap = {
+      'kawaii': 'kawaii style, big sparkly eyes, super cute simple shapes, adorable cartoon',
+      'bold-simple': 'bold and easy style for young children, large clear shapes, minimal detail',
+      'cartoon': 'classic friendly cartoon style, clean outlines, expressive faces',
+      'mandala': 'mandala style, intricate geometric patterns, symmetrical, detailed line work',
+      'zentangle': 'zentangle inspired, intricate patterns filling shapes, meditative detail',
+      'realistic-outline': 'realistic animal proportions, clean contour line art, anatomical accuracy',
+      'whimsical': 'whimsical storybook style, playful and imaginative',
+      'minimal': 'minimalist clean silhouette style, very simple elegant lines'
+    };
+
+    const complexityMap = {
+      'preschool': 'preschool level, very simple shapes, huge colorable areas, thickest lines, almost no small details',
+      'kids': 'kids coloring book level, clear friendly shapes, good sized colorable areas, balanced detail',
+      'tweens': 'tween level, more interesting details while still clear outlines',
+      'adults': 'adult coloring book level, intricate details, finer lines, complex patterns'
+    };
+
+    const lineMap = {
+      'thick': 'thick bold black outlines approximately 4 to 6 pixels wide',
+      'medium': 'medium bold black outlines approximately 2 to 4 pixels wide',
+      'thin': 'thin precise black outlines approximately 1 to 2 pixels wide'
+    };
+
+    const faithMap = {
+      'yes': 'include gentle Christian symbols such as a small simple cross, dove, or heart, wholesome and positive',
+      'subtle': 'very subtle faith elements only (small cross or dove or rainbow), keep focus on the cute animals',
+      'no': 'no religious symbols, pure cute animals and nature only'
+    };
+
+    // ========== BUILD PAGE PROMPT ==========
+    function buildPagePrompt() {
+      const subject = document.getElementById('subject').value.trim() || 'cute animals';
+      const style = styleMap[document.getElementById('style').value];
+      const complexity = complexityMap[document.getElementById('complexity').value];
+      const line = lineMap[document.getElementById('lineWeight').value];
+      const faith = faithMap[document.getElementById('faith').value];
+      const aspect = document.getElementById('aspect').value;
+      const extra = document.getElementById('extra').value.trim();
+      const subjectsPerPage = parseInt(document.getElementById('subjectsPerPage').value) || 1;
+      let numPages = parseInt(document.getElementById('numPages').value) || 1;
+      if (numPages < 1) numPages = 1;
+      if (numPages > 30) numPages = 30;
+
+      // Subject count phrasing
+      const subjectCountText = {
+        1: 'single main subject, centered and focused',
+        2: 'exactly two subjects, nicely spaced or gently interacting',
+        3: 'exactly three subjects arranged in a balanced composition',
+        4: 'exactly four subjects in a lively but clear scene'
+      }[subjectsPerPage];
+
+      // Variation ideas so multi-page books feel distinct (cycles if needed)
+      const variations = [
+        'peaceful and calm pose',
+        'happy and playful expression',
+        'curious and looking around',
+        'gentle interaction with a small prop',
+        'sitting or resting pose',
+        'walking or moving pose',
+        'looking upward with wonder',
+        'surrounded by simple nature elements',
+        'close-up friendly composition',
+        'slightly wider scene with soft background shapes',
+        'holding a small flower or leaf',
+        'under a simple rainbow arc',
+        'beside a small heart or cross',
+        'smiling and facing the viewer',
+        'side profile with gentle expression',
+        'playing or tumbling lightly',
+        'napping or resting peacefully',
+        'reaching toward something small',
+        'standing on soft grass or simple ground',
+        'framed by simple clouds or stars',
+        'with a tiny butterfly or bird nearby',
+        'in a simple garden or meadow setting',
+        'looking at a small shining star',
+        'sharing a gentle moment together',
+        'with soft flowing lines suggesting movement',
+        'in a cozy nested or sheltered pose',
+        'celebrating with a small joyful gesture',
+        'exploring a simple path or trail',
+        'beside a gentle stream or pond outline',
+        'under soft sunlight rays or glow',
+        'with a simple decorative border of leaves or hearts',
+        'in a balanced symmetrical composition',
+        'with open space for easy coloring around the edges'
+      ];
+
+      const prompts = [];
+
+      for (let i = 0; i < numPages; i++) {
+        let prompt = `Coloring book page for kids, ${subject}, ${subjectCountText}, ${style}, ${complexity}, ${line}, clean continuous black outlines only, no shading, no gray tones, no gradients, no fills, no crosshatching, pure white background, high contrast black and white line art, printable, large enclosed colorable areas`;
+
+        if (faith !== faithMap['no']) {
+          prompt += `, ${faith}`;
+        }
+
+        if (extra) {
+          prompt += `, ${extra}`;
+        }
+
+        // Add a light variation when generating multiple pages
+        if (numPages > 1) {
+          const variation = variations[i % variations.length];
+          prompt += `, ${variation}`;
+        }
+
+        if (aspect === 'portrait') prompt += `, portrait orientation`;
+        else if (aspect === 'square') prompt += `, square composition`;
+        else prompt += `, landscape orientation`;
+
+        prompt += `.`;
+
+        if (numPages > 1) {
+          prompts.push(`--- PAGE ${i + 1} ---\n${prompt}`);
+        } else {
+          prompts.push(prompt);
+        }
+      }
+
+      document.getElementById('pagePrompt').value = prompts.join('\n\n');
+    }
+
+    // ========== BUILD COVER PROMPT ==========
+    function buildCoverPrompt() {
+      const title = document.getElementById('coverTitle').value.trim() || "God's Cute Animals";
+      const subtitle = document.getElementById('coverSubtitle').value.trim();
+      const theme = document.getElementById('coverTheme').value.trim();
+      const style = document.getElementById('coverStyle').value;
+      const mood = document.getElementById('coverMood').value;
+      const extra = document.getElementById('coverExtra').value.trim();
+
+      const styleText = {
+        'kawaii-pastel': 'kawaii style with soft pastel colors, big cute eyes, adorable',
+        'bright-cartoon': 'bright cheerful cartoon illustration',
+        'watercolor': 'soft watercolor painting style',
+        'digital-illustration': 'clean polished digital illustration',
+        'storybook': 'classic children\'s storybook illustration style'
+      }[style];
+
+      const moodText = {
+        'pastel': 'soft pastel color palette',
+        'bright': 'bright vibrant cheerful colors',
+        'warm': 'warm golden sunlight and cozy tones',
+        'cool': 'cool calm blues and soft greens'
+      }[mood];
+
+      let prompt = `Full color book cover art for a kids coloring book titled "${title}"`;
+      if (subtitle) prompt += ` with subtitle "${subtitle}"`;
+      prompt += `. Main visual: ${theme}. Style: ${styleText}, ${moodText}, inviting and wholesome, soft lighting, high quality illustration, leave clean space at the top for the title text, professional children book cover design`;
+
+      if (extra) prompt += `, ${extra}`;
+
+      prompt += `.`;
+
+      document.getElementById('coverPrompt').value = prompt;
+    }
+
+    // ========== COPY ==========
+    function copyPrompt(id) {
+      const el = document.getElementById(id);
+      el.select();
+      document.execCommand('copy');
+      // visual feedback
+      const btn = event.target;
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = original, 1500);
+    }
+
+    // ========== SAVE / LOAD ==========
+    function saveStyle(type) {
+      const prompt = type === 'page' 
+        ? document.getElementById('pagePrompt').value 
+        : document.getElementById('coverPrompt').value;
+      
+      if (!prompt) {
+        alert('Generate a prompt first!');
+        return;
+      }
+
+      const name = prompt.slice(0, 60) + '...';
+      const saved = JSON.parse(localStorage.getItem('cbs_saved') || '[]');
+      saved.unshift({
+        id: Date.now(),
+        type,
+        name,
+        prompt,
+        date: new Date().toLocaleString()
+      });
+      localStorage.setItem('cbs_saved', JSON.stringify(saved.slice(0, 30))); // keep last 30
+      alert('Style saved! Check the “Saved Styles & Agents” tab.');
+    }
+
+    function renderSaved() {
+      const list = document.getElementById('savedList');
+      const saved = JSON.parse(localStorage.getItem('cbs_saved') || '[]');
+      
+      if (saved.length === 0) {
+        list.innerHTML = '<p class="text-slate-500 text-sm">No saved styles yet. Generate a prompt and click “Save this Style as Agent”.</p>';
+        return;
+      }
+
+      list.innerHTML = saved.map(item => `
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs px-2 py-0.5 rounded-full ${item.type === 'page' ? 'bg-sky-500/20 text-sky-300' : 'bg-purple-500/20 text-purple-300'}">
+                  ${item.type === 'page' ? 'Page' : 'Cover'}
+                </span>
+                <span class="text-xs text-slate-500">${item.date}</span>
+              </div>
+              <p class="text-sm text-slate-300 truncate">${item.name}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="loadSaved(${item.id})" class="text-xs px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Load</button>
+              <button onclick="copySaved(${item.id})" class="text-xs px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Copy</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadSaved(id) {
+      const saved = JSON.parse(localStorage.getItem('cbs_saved') || '[]');
+      const item = saved.find(s => s.id === id);
+      if (!item) return;
+      
+      if (item.type === 'page') {
+        switchTab('page');
+        document.getElementById('pagePrompt').value = item.prompt;
+      } else {
+        switchTab('cover');
+        document.getElementById('coverPrompt').value = item.prompt;
+      }
+    }
+
+    function copySaved(id) {
+      const saved = JSON.parse(localStorage.getItem('cbs_saved') || '[]');
+      const item = saved.find(s => s.id === id);
+      if (item) {
+        navigator.clipboard.writeText(item.prompt);
+        alert('Prompt copied to clipboard!');
+      }
+    }
+
+    function clearSaved() {
+      if (confirm('Clear all saved styles?')) {
+        localStorage.removeItem('cbs_saved');
+        renderSaved();
+      }
+    }
+
+    // Auto-build initial prompts on load
+    window.addEventListener('DOMContentLoaded', () => {
+      buildPagePrompt();
+      buildCoverPrompt();
+    });
+  </script>
+</body>
+</html>
